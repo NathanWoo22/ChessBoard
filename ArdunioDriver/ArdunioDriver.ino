@@ -4,6 +4,8 @@
 AccelStepper stepper1(1, 5, 2);
 AccelStepper stepper2(1, 6, 4);
 
+int speed1 = 300;
+int speed2 = 300; 
 
 void setup() {
   // put your setup code here, to run once:
@@ -16,16 +18,24 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 
-  stepper1.setSpeed(500);
-  stepper1.runSpeed();
- 
-  stepper2.setSpeed(500);
-  stepper2.runSpeed();
+  if (Serial.available()) {
+    // get incoming bytees
+    String readstring = Serial.readString();
+    speed1 = readstring.toInt();
+    Serial.println(speed1);
+    if (speed1 == 1){
+      Serial.print("should be exiting");
+      exit(0);
+      Serial.print("Obviously not exiting");
+    }
+    delay(1000);
+  }
 
-  if (Serial.available() > 0) {
-    // get incoming byte:
-    int x = Serial.readString().toInt();
-    Serial.print(x);
-    exit(0);
+  else{
+    stepper1.setSpeed(speed1);
+    stepper1.runSpeed();
+  
+    stepper2.setSpeed(speed2);
+    stepper2.runSpeed();
   }
 }
