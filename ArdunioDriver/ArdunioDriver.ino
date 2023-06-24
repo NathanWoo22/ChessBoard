@@ -10,20 +10,25 @@ int speed2 = 300;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  stepper1.setMaxSpeed(500);
-  stepper2.setMaxSpeed(500);
+  stepper1.setMaxSpeed(1000);
+  stepper2.setMaxSpeed(1000);
 
+  // Initialize current position in case it is necessary
+  stepper1.setCurrentPosition(stepper1.currentPosition());
+  stepper2.setCurrentPosition(stepper2.currentPosition());
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  // stepper1.moveTo(100);
+  //put your main code here, to run repeatedly:
 
   if (Serial.available()) {
     // get incoming bytees
     String readstring = Serial.readString();
-    speed1 = readstring.toInt();
-    Serial.println(speed1);
-    if (speed1 == 1){
+    int newLocation = readstring.toInt();
+    Serial.println(newLocation);
+    driveTo(newLocation, stepper2);
+    if (newLocation == 0){
       Serial.print("should be exiting");
       exit(0);
       Serial.print("Obviously not exiting");
@@ -32,10 +37,19 @@ void loop() {
   }
 
   else{
-    stepper1.setSpeed(speed1);
-    stepper1.runSpeed();
-  
-    stepper2.setSpeed(speed2);
-    stepper2.runSpeed();
+    delay(100);
+  }
+}
+
+void driveTo(int position, AccelStepper stepper){
+  int kp = 2;
+  int kd = 0.4;
+  int speed = 0;
+  while(abs(position - stepper.currentPosition()) > 0){
+    // PD variable
+    speed = kp * (position - stepper.currentPosition()) - kd * speed;
+    stepper.setSpeed(speed);
+    stepper.runSpeed(); 
+    Serial.println(stepper.currentPosition());
   }
 }

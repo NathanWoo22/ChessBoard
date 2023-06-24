@@ -10,5 +10,5 @@ while True:
     # arduino.write(int(num))
     time.sleep(0.05)
     data = arduino.readline().decode()
-    print(data)
+    print(data, end ="")
     # print(value) # printing the value
